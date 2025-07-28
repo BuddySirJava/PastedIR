@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raw Content - Pasted IR</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            background-color: #ffffff;
+            color: #000000;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0f172a;
+                color: #f8fafc;
+            }
+            
+            .password-form {
+                background: #1e293b;
+                border-color: #475569;
+                color: #f8fafc;
+            }
+            
+            .password-form input {
+                background: #334155;
+                border-color: #475569;
+                color: #f8fafc;
+            }
+            
+            .password-form button {
+                background: #2563eb;
+            }
+            
+            .password-form button:hover {
+                background: #1d4ed8;
+            }
+        }
+        
+        /* Ensure text is selectable */
+        * {
+            -webkit-touch-callout: default;
+            -webkit-user-select: text;
+            -khtml-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+        
+        /* Password form styling */
+        .password-form {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        
+        .password-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .password-form button {
+            width: 100%;
+            padding: 10px;
+            background: #007cba;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .password-form button:hover {
+            background: #005a87;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .password-form {
+                background: #2a2a2a;
+                border-color: #555;
+                color: #fff;
+            }
+            
+            .password-form input {
+                background: #333;
+                border-color: #555;
+                color: #fff;
+            }
+        }
+    </style>
+</head>
+<body>
+{% if content %}
+{{ content }}
+{% elif error %}
+{{ error }}
+{% elif has_password %}
+<div class="password-form">
+    <h3>Password Protected</h3>
+    <p>This paste is password protected. Please enter the password to view the content.</p>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="password" name="password" placeholder="Enter password" required>
+        <button type="submit">View Content</button>
+    </form>
+</div>
+{% else %}
+No content available.
+{% endif %}
+</body>
+</html> 

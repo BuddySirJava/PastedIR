@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block title %}Create New Paste - Pasted IR{% endblock %}
+
+{% block description %}Create a new paste with encryption and syntax highlighting{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6 text-theme-primary">Create a New Paste</h1>
+    
+    <form method="POST" class="card rounded-lg p-6 shadow-md">
+        {% csrf_token %}
+        
+        <div class="mb-6">
+            <label for="content" class="block text-theme-primary font-semibold mb-2">Content:</label>
+            <textarea 
+                name="content" 
+                id="content" 
+                rows="15" 
+                class="w-full border border-theme rounded-lg p-4 resize-y focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                placeholder="Enter your code or text here..."
+                required
+            ></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+                <label for="password" class="block text-theme-primary font-semibold mb-2">Password (Optional):</label>
+                <input 
+                    type="password" 
+                    name="password" 
+                    id="password" 
+                    class="w-full border border-theme rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Leave empty for no encryption"
+                >
+            </div>
+
+            <div>
+                <label for="language" class="block text-theme-primary font-semibold mb-2">Language:</label>
+                <select 
+                    name="language" 
+                    id="language" 
+                    class="w-full border border-theme rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                    required
+                >
+                    <option value="auto" selected>🤖 Auto Detect</option>
+                    {% for language in languages %}
+                        <option value="{{ language.id }}">{{ language.displayname }}</option>
+                    {% endfor %}
+                </select>
+                <div id="detectedLanguage" class="mt-2 text-sm text-theme-secondary hidden">
+                    <span>Detected: </span><span id="detectedLanguageName" class="font-semibold"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+                <label for="expiration" class="block text-theme-primary font-semibold mb-2">Expiration:</label>
+                <select 
+                    name="expiration" 
+                    id="expiration" 
+                    class="w-full border border-theme rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                    required
+                >
+                    <option value="">Select expiration</option>
+                    <option value="0.007">After 10 minutes</option>
+                    <option value="0.042">After 1 hour</option>
+                    <option value="1">After 1 day</option>
+                    <option value="7">After 7 days</option>
+                    <option value="23">After 23 days</option>
+                </select>
+            </div>
+
+            <div class="flex items-center">
+                <label class="inline-flex items-center cursor-pointer">
+                    <input 
+                        type="checkbox" 
+                        name="one_time" 
+                        id="one_time" 
+                        class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
+                    >
+                    <span class="ml-3 text-theme-primary font-semibold">One-time paste</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="flex justify-end">
+            <button 
+                type="submit" 
+                class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+                Create Paste
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Language detection functionality
+    const textarea = document.getElementById('content');
+    const languageSelect = document.getElementById('language');
+    const detectedLanguageDiv = document.getElementById('detectedLanguage');
+    const detectedLanguageName = document.getElementById('detectedLanguageName');
+    
+    // Language detection mapping (common file extensions and keywords)
+    const languagePatterns = {
+        'python': {
+            patterns: [/^#!/, /import\s+/, /def\s+\w+/, /class\s+\w+/, /\.py$/],
+            keywords: ['def', 'class', 'import', 'from', 'if __name__', 'print', 'return', 'self']
+        },
+        'javascript': {
+            patterns: [/function\s+\w+/, /const\s+/, /let\s+/, /var\s+/, /\.js$/],
+            keywords: ['function', 'const', 'let', 'var', 'console.log', '=>', 'async', 'await']
+        },
+        'html': {
+            patterns: [/<!DOCTYPE html>/, /<html/, /<head>/, /<body>/, /\.html$/],
+            keywords: ['<!DOCTYPE', '<html', '<head', '<body', '<div', '<span']
+        },
+        'css': {
+            patterns: [/\.\w+\s*\{/, /@media/, /@import/, /\.css$/],
+            keywords: ['{', '}', ':', ';', '@media', '@import', 'background', 'color']
+        },
+        'java': {
+            patterns: [/public\s+class/, /import\s+java/, /System\.out/, /\.java$/],
+            keywords: ['public', 'class', 'import', 'System.out', 'static', 'void']
+        },
+        'cpp': {
+            patterns: [/#include/, /using\s+namespace/, /std::/, /\.cpp$/],
+            keywords: ['#include', 'using namespace', 'std::', 'cout', 'cin', 'int main']
+        },
+        'c': {
+            patterns: [/#include/, /int\s+main/, /printf/, /scanf/, /\.c$/],
+            keywords: ['#include', 'int main', 'printf', 'scanf', 'malloc', 'free']
+        },
+        'php': {
+            patterns: [/<\?php/, /\$\w+/, /echo/, /\.php$/],
+            keywords: ['<?php', 'echo', '$', 'function', 'class', 'namespace']
+        },
+        'sql': {
+            patterns: [/SELECT/, /INSERT/, /UPDATE/, /DELETE/, /CREATE/, /\.sql$/],
+            keywords: ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'FROM', 'WHERE']
+        },
+        'bash': {
+            patterns: [/#!/bin/, /echo/, /if\s+\[/, /for\s+/, /\.sh$/],
+            keywords: ['#!/bin', 'echo', 'if [', 'for', 'while', 'do', 'done']
+        },
+        'json': {
+            patterns: [/^\s*\{/, /^\s*\[/, /"[\w-]+":/, /\.json$/],
+            keywords: ['{', '}', '[', ']', ':', '"', 'true', 'false', 'null']
+        },
+        'xml': {
+            patterns: [/<\?xml/, /<[^>]+>/, /<\/[^>]+>/, /\.xml$/],
+            keywords: ['<?xml', '<', '>', '</', 'version=', 'encoding=']
+        },
+        'yaml': {
+            patterns: [/^\s*\w+:/, /^\s*-\s+/, /\.yml$/, /\.yaml$/],
+            keywords: [':', '-', 'version:', 'name:', 'description:']
+        },
+        'markdown': {
+            patterns: [/^#\s+/, /^\*\s+/, /^-\s+/, /\.md$/],
+            keywords: ['#', '*', '-', '##', '###', '**', '__']
+        }
+    };
+    
+    // Language detection function
+    function detectLanguage(content) {
+        if (!content.trim()) return null;
+        
+        const lines = content.split('\n');
+        const firstLine = lines[0].toLowerCase();
+        const contentLower = content.toLowerCase();
+        
+        // Check for shebang
+        if (firstLine.startsWith('#!')) {
+            if (firstLine.includes('python')) return 'python';
+            if (firstLine.includes('bash') || firstLine.includes('sh')) return 'bash';
+            if (firstLine.includes('node')) return 'javascript';
+        }
+        
+        // Score each language based on patterns and keywords
+        const scores = {};
+        
+        for (const [lang, config] of Object.entries(languagePatterns)) {
+            let score = 0;
+            
+            // Check patterns
+            for (const pattern of config.patterns) {
+                if (pattern.test(content)) score += 10;
+            }
+            
+            // Check keywords
+            for (const keyword of config.keywords) {
+                const regex = new RegExp('\\b' + keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+                const matches = content.match(regex);
+                if (matches) score += matches.length;
+            }
+            
+            if (score > 0) scores[lang] = score;
+        }
+        
+        // Return the language with the highest score
+        if (Object.keys(scores).length > 0) {
+            return Object.entries(scores).reduce((a, b) => scores[a[0]] > scores[b[0]] ? a : b)[0];
+        }
+        
+        return null;
+    }
+    
+    // Update detected language display
+    function updateDetectedLanguage() {
+        const content = textarea.value;
+        const detectedLang = detectLanguage(content);
+        
+        if (detectedLang && languageSelect.value === 'auto') {
+            detectedLanguageName.textContent = detectedLang.charAt(0).toUpperCase() + detectedLang.slice(1);
+            detectedLanguageDiv.classList.remove('hidden');
+        } else {
+            detectedLanguageDiv.classList.add('hidden');
+        }
+    }
+    
+    // Event listeners for language detection
+    textarea.addEventListener('input', updateDetectedLanguage);
+    languageSelect.addEventListener('change', updateDetectedLanguage);
+    
+    // Fullscreen functionality for textarea
+    const fullscreenBtn = document.createElement('button');
+    fullscreenBtn.type = 'button';
+    fullscreenBtn.innerHTML = '🔍 Fullscreen';
+    fullscreenBtn.className = 'absolute top-2 right-2 bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700 transition-colors';
+    fullscreenBtn.style.position = 'absolute';
+    fullscreenBtn.style.top = '10px';
+    fullscreenBtn.style.right = '10px';
+    
+    const textareaContainer = textarea.parentElement;
+    textareaContainer.style.position = 'relative';
+    textareaContainer.appendChild(fullscreenBtn);
+    
+    fullscreenBtn.addEventListener('click', function() {
+        if (textarea.classList.contains('fullscreen-mode')) {
+            exitFullscreen();
+        } else {
+            enterFullscreen();
+        }
+    });
+    
+    function enterFullscreen() {
+        textarea.classList.add('fullscreen-mode');
+        fullscreenBtn.innerHTML = '❌ Exit';
+        document.body.style.overflow = 'hidden';
+        
+        // Add blur overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'blur-overlay';
+        overlay.style.display = 'block';
+        overlay.addEventListener('click', exitFullscreen);
+        document.body.appendChild(overlay);
+        
+        // Add exit icon
+        const exitIcon = document.createElement('div');
+        exitIcon.className = 'exit-fullscreen-icon';
+        exitIcon.innerHTML = '❌';
+        exitIcon.addEventListener('click', exitFullscreen);
+        textarea.parentElement.appendChild(exitIcon);
+        
+        // Focus on textarea
+        textarea.focus();
+    }
+    
+    function exitFullscreen() {
+        textarea.classList.remove('fullscreen-mode');
+        fullscreenBtn.innerHTML = '🔍 Fullscreen';
+        document.body.style.overflow = '';
+        
+        // Remove overlay
+        const overlay = document.querySelector('.blur-overlay');
+        if (overlay) overlay.remove();
+        
+        // Remove exit icon
+        const exitIcon = document.querySelector('.exit-fullscreen-icon');
+        if (exitIcon) exitIcon.remove();
+        
+        // Remove blur overlay
+        const blurOverlay = document.querySelector('.blur-overlay');
+        if (blurOverlay) blurOverlay.remove();
+    }
+    
+    // Keyboard shortcuts for fullscreen
+    document.addEventListener('keydown', function(e) {
+        // F11 for fullscreen toggle
+        if (e.key === 'F11' && document.activeElement === textarea) {
+            e.preventDefault();
+            if (textarea.classList.contains('fullscreen-mode')) {
+                exitFullscreen();
+            } else {
+                enterFullscreen();
+            }
+        }
+        
+        // Escape key to exit fullscreen
+        if (e.key === 'Escape' && textarea.classList.contains('fullscreen-mode')) {
+            e.preventDefault();
+            exitFullscreen();
+        }
+    });
+</script>
+{% endblock %}

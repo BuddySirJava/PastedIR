@@ -1,0 +1,227 @@
+openapi: 3.0.3
+info:
+  title: Pastebin IR Documentation
+  version: 0.1 Snapshot
+  description: A simple django based pastebin
+paths:
+  /api/languages/:
+    get:
+      operationId: languages_list
+      tags:
+      - languages
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Language'
+          description: ''
+  /api/pastes/:
+    get:
+      operationId: pastes_list
+      tags:
+      - pastes
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Paste'
+          description: ''
+    post:
+      operationId: pastes_create
+      tags:
+      - pastes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Paste'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Paste'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Paste'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Paste'
+          description: ''
+  /api/pastes/{id}/:
+    get:
+      operationId: pastes_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - pastes
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Paste'
+          description: ''
+    put:
+      operationId: pastes_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - pastes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Paste'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Paste'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Paste'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Paste'
+          description: ''
+    patch:
+      operationId: pastes_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - pastes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPaste'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPaste'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPaste'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Paste'
+          description: ''
+    delete:
+      operationId: pastes_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - pastes
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    Language:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        displayname:
+          type: string
+          maxLength: 255
+        alias:
+          type: string
+          maxLength: 255
+      required:
+      - alias
+      - displayname
+      - id
+    Paste:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        lang:
+          $ref: '#/components/schemas/Language'
+      required:
+      - created
+      - id
+      - lang
+    PatchedPaste:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        lang:
+          $ref: '#/components/schemas/Language'
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

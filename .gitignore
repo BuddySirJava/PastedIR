@@ -1,0 +1,16 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+.venv/
+.env
+telegram bot/
+nginx/
+static/admin/
+static/rest_framework/
+static/robots.txt
+static/sitemap.xml
+db.sqlite3
+.idea
+api/migrations/
+api/__pycache__/
+website/__pycache__/
+website/migrations/
+pastebinir/.pycache/

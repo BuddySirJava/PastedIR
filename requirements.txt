@@ -1,0 +1,11 @@
+Django==5.1.4
+djangorestframework
+drf-spectacular
+dj-rest-auth
+cryptography 
+bcrypt
+gunicorn
+celery
+redis
+django-redis
+python-dotenv

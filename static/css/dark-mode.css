@@ -1,0 +1,279 @@
+/* Additional dark mode styles for better compatibility */
+
+/* Ensure proper contrast in dark mode */
+.dark .text-gray-700 {
+    color: var(--text-primary) !important;
+}
+
+.dark .text-gray-600 {
+    color: var(--text-secondary) !important;
+}
+
+.dark .bg-white {
+    background-color: var(--bg-primary) !important;
+}
+
+.dark .border-gray-300 {
+    border-color: var(--border-color) !important;
+}
+
+/* Improve form element styling in dark mode */
+.dark input::placeholder,
+.dark textarea::placeholder {
+    color: var(--text-secondary) !important;
+}
+
+/* Better button styling in dark mode */
+.dark .hover\:bg-blue-100:hover {
+    background-color: #1e40af !important;
+}
+
+/* Improve link colors in dark mode */
+.dark a {
+    color: #60a5fa;
+}
+
+.dark a:hover {
+    color: #93c5fd;
+}
+
+/* Ensure proper focus states */
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Improve card shadows in dark mode */
+.dark .shadow-md {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Better syntax highlighting in dark mode */
+.dark .hljs {
+    background-color: #1e1e1e !important;
+    color: #d4d4d4 !important;
+}
+
+/* Improved code block styling for dark mode */
+.dark pre {
+    background-color: #1e1e1e !important;
+    border: 1px solid #404040 !important;
+    color: #d4d4d4 !important;
+}
+
+.dark code {
+    color: #d4d4d4 !important;
+    background-color: #1e1e1e !important;
+}
+
+/* Better contrast for syntax highlighting tokens */
+.dark .hljs-keyword {
+    color: #569cd6 !important;
+}
+
+.dark .hljs-string {
+    color: #ce9178 !important;
+}
+
+.dark .hljs-comment {
+    color: #6a9955 !important;
+}
+
+.dark .hljs-number {
+    color: #b5cea8 !important;
+}
+
+.dark .hljs-function {
+    color: #dcdcaa !important;
+}
+
+.dark .hljs-variable {
+    color: #9cdcfe !important;
+}
+
+.dark .hljs-title {
+    color: #dcdcaa !important;
+}
+
+.dark .hljs-params {
+    color: #9cdcfe !important;
+}
+
+.dark .hljs-built_in {
+    color: #4ec9b0 !important;
+}
+
+.dark .hljs-literal {
+    color: #569cd6 !important;
+}
+
+.dark .hljs-type {
+    color: #4ec9b0 !important;
+}
+
+.dark .hljs-property {
+    color: #9cdcfe !important;
+}
+
+.dark .hljs-attr {
+    color: #9cdcfe !important;
+}
+
+.dark .hljs-tag {
+    color: #569cd6 !important;
+}
+
+.dark .hljs-name {
+    color: #569cd6 !important;
+}
+
+.dark .hljs-attribute {
+    color: #9cdcfe !important;
+}
+
+.dark .hljs-value {
+    color: #ce9178 !important;
+}
+
+/* Better text contrast in dark mode */
+.dark {
+    --text-primary: #f8fafc !important;
+    --text-secondary: #cbd5e1 !important;
+    --bg-primary: #1e293b !important;
+    --bg-secondary: #0f172a !important;
+    --bg-tertiary: #334155 !important;
+    --border-color: #475569 !important;
+    --code-bg: #1e1e1e !important;
+    --code-border: #404040 !important;
+}
+
+/* Ensure proper transitions */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Improve theme toggle visibility */
+.theme-toggle {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark .theme-toggle {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Better mobile responsiveness for theme toggle */
+@media (max-width: 640px) {
+    .theme-toggle {
+        width: 50px;
+        height: 25px;
+    }
+    
+    .theme-toggle-slider {
+        width: 21px;
+        height: 21px;
+    }
+    
+    .theme-toggle.dark .theme-toggle-slider {
+        transform: translateX(25px);
+    }
+}
+
+/* Fix header blending issues */
+.dark header {
+    background-color: #1e40af !important;
+    border-bottom: 1px solid #475569 !important;
+}
+
+/* Better contrast for intro text in dark mode */
+.dark .intro-text {
+    background-color: #1e293b !important;
+    border: 1px solid #475569 !important;
+}
+
+.dark .intro-text .text-xl {
+    color: #f8fafc !important;
+}
+
+.dark .intro-text .text-lg {
+    color: #cbd5e1 !important;
+}
+
+.dark .intro-text .text-sm {
+    color: #94a3b8 !important;
+}
+
+/* Improve card contrast in dark mode */
+.dark .card {
+    background-color: #1e293b !important;
+    border: 1px solid #475569 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Better button contrast in dark mode */
+.dark .bg-blue-600 {
+    background-color: #3b82f6 !important;
+    color: white !important;
+}
+
+.dark .bg-blue-600:hover {
+    background-color: #2563eb !important;
+}
+
+.dark .bg-gray-600 {
+    background-color: #475569 !important;
+    color: white !important;
+}
+
+.dark .bg-gray-600:hover {
+    background-color: #374151 !important;
+}
+
+.dark .bg-green-600 {
+    background-color: #059669 !important;
+    color: white !important;
+}
+
+.dark .bg-green-600:hover {
+    background-color: #047857 !important;
+}
+
+/* Force important overrides for navigation buttons */
+.dark .nav-btn {
+    background-color: #1e293b !important;
+    color: #60a5fa !important;
+    border: 1px solid #475569 !important;
+}
+
+.dark .nav-btn:hover {
+    background-color: #334155 !important;
+    color: #93c5fd !important;
+}
+
+/* Force important overrides for main CTA button */
+.dark .main-cta-btn {
+    background-color: #3b82f6 !important;
+    color: white !important;
+}
+
+.dark .main-cta-btn:hover {
+    background-color: #2563eb !important;
+}
+
+/* Ensure all text is readable in dark mode */
+.dark * {
+    color: inherit;
+}
+
+.dark body {
+    color: #f8fafc !important;
+}
+
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    color: #f8fafc !important;
+}
+
+.dark p {
+    color: #cbd5e1 !important;
+} 

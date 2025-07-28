@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Page Not Found - Pasted IR{% endblock %}
+
+{% block description %}The page you are looking for could not be found{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <div class="text-center">
+        <div class="mb-8">
+            <img src="{% static '404.gif' %}" alt="404 Error" class="mx-auto" style="width: 400px; height: 400px; object-fit: contain;">
+        </div>
+        
+        <div class="card rounded-lg p-8 max-w-2xl mx-auto">
+            <h1 class="text-4xl font-bold mb-4 text-theme-primary">404 - Page Not Found</h1>
+            
+            <p class="text-lg text-theme-secondary mb-8">
+                The paste you are looking for has either expired or been deleted.
+            </p>
+            
+            <div class="space-y-4">
+                <a href="{% url 'create_paste' %}" 
+                   class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors text-lg">
+                    Create Your Paste!
+                </a>
+                
+                <div class="mt-4">
+                    <a href="{% url 'home' %}" 
+                       class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                        ← Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

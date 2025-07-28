@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}About - Pasted IR{% endblock %}
+
+{% block description %}About Pasted IR - A secure pastebin service for Iran{% endblock %}
+
+{% block extra_head %}
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <div class="text-center">
+        <div class="mb-8">
+            <lottie-player 
+                src="https://lottie.host/47ff9253-9e1d-494a-8655-4124ab6dc980/DCE0udF6IJ.json" 
+                class="mx-auto" 
+                background="transparent" 
+                style="width: 200px; height: 200px" 
+                speed="1" 
+                loop="" 
+                autoplay="">
+            </lottie-player>
+        </div>
+        
+        <div class="card rounded-lg p-8 max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold mb-6 text-theme-primary">About Pasted IR</h1>
+            
+            <div class="space-y-4 text-theme-secondary">
+                <p class="text-lg">This is my first Django project!</p>
+                <p class="text-lg">I made this for my log submits and code sharing needs.</p>
+                <p class="text-lg">A secure, privacy-focused pastebin service for Iran.</p>
+                <p class="text-lg font-semibold text-theme-primary">Made with ❤️ by Mahyar Darvishi</p>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-theme">
+                <h2 class="text-xl font-semibold mb-4 text-theme-primary">Features</h2>
+                <ul class="text-left space-y-2 text-theme-secondary">
+                    <li>• Secure encryption for your content</li>
+                    <li>• Syntax highlighting for code</li>
+                    <li>• Password protection</li>
+                    <li>• Configurable expiration times</li>
+                    <li>• One-time paste option</li>
+                    <li>• Dark mode support</li>
+                    <li>• No registration required</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Pasted IR - Free Secure Pastebin{% endblock %}
+
+{% block description %}Pasted IR is a free, secure, privacy-focused pastebin for sharing text and code.{% endblock %}
+
+{% block extra_head %}
+<meta name="keywords" content="pastebin, free, secure, code, text, share, privacy, encryption">
+<link rel="canonical" href="https://pasted.ir/" />
+<!-- Open Graph -->
+<meta property="og:title" content="Pasted IR - Free Secure Pastebin" />
+<meta property="og:description" content="Pasted IR is a free, secure, privacy-focused pastebin for sharing text and code." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://pasted.ir/" />
+<meta property="og:site_name" content="Pasted IR" />
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Pasted IR",
+  "url": "https://pasted.ir/",
+  "description": "Pasted IR is a free, secure, privacy-focused pastebin for sharing text and code.",
+  "applicationCategory": "UtilitiesApplication",
+  "inLanguage": "en"
+}
+</script>
+{% endblock %}
+
+{% block nav_links %}
+<a href="{% url 'create_paste' %}" class="nav-btn bg-white text-blue-600 font-semibold px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors">Create New Paste</a>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <div class="intro-text">
+        <div class="text-xl font-bold mb-2">Welcome to Pasted IR</div>
+        <div class="text-lg">A free, secure, and privacy-focused pastebin for sharing text and code.</div>
+    </div>
+    
+    <div class="text-center mb-8">
+        <a href="{% url 'create_paste' %}" class="main-cta-btn bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors text-lg">
+            Create New Paste
+        </a>
+    </div>
+    
+    <div class="card rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4 text-theme-primary">Recent Pastes</h2>
+        {% if pastes %}
+            <ul class="space-y-2">
+                {% for paste in pastes %}
+                    <li class="border-b border-theme pb-2 last:border-b-0">
+                        <a href="{% url 'view_encrypted_paste' paste.id %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                            {{ paste.created }} - {{ paste.content|truncatewords:10 }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-theme-secondary italic">No recent pastes available.</p>
+        {% endif %}
+    </div>
+    
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="card rounded-lg p-6 text-center">
+            <div class="text-3xl mb-2">🔒</div>
+            <h3 class="text-lg font-semibold mb-2 text-theme-primary">Secure</h3>
+            <p class="text-theme-secondary">Your content is encrypted and protected with industry-standard security.</p>
+        </div>
+        
+        <div class="card rounded-lg p-6 text-center">
+            <div class="text-3xl mb-2">⚡</div>
+            <h3 class="text-lg font-semibold mb-2 text-theme-primary">Fast</h3>
+            <p class="text-theme-secondary">Create and share pastes instantly with our optimized platform.</p>
+        </div>
+        
+        <div class="card rounded-lg p-6 text-center">
+            <div class="text-3xl mb-2">🛡️</div>
+            <h3 class="text-lg font-semibold mb-2 text-theme-primary">Private</h3>
+            <p class="text-theme-secondary">No registration required. Your privacy is our priority.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
