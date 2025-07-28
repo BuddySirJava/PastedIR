@@ -42,7 +42,8 @@ PastedIR/
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.8+
+- Python 3.11+
+- uv
 - Docker & Docker Compose
 - Redis (for Celery tasks)
 
@@ -75,14 +76,12 @@ docker-compose down
 
 ### 4. Manual Setup (Development)
 ```bash
-# Create virtual environment
-python -m venv .venv
+# sync dependencies
+uv sync 
 source .venv/bin/activate  # Linux/Mac
 # or
 .venv\Scripts\activate     # Windows
 
-# Install dependencies
-pip install -r requirements.txt
 
 # Run migrations
 python manage.py migrate
