@@ -1,21 +1,21 @@
-version: '3.9'
+volumes:
+  production_django_media: {}
+  production_django_static: {}
+  production_redis_data: {}
+
 
 services:
-  web:
-    build: .
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py collectstatic --noinput &&
-             gunicorn pastebinir.wsgi:application --bind 0.0.0.0:8000"
+  django: &django
+    build: 
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
+
     volumes:
-      - ./static:/static
-      - ./db.sqlite3:/app/db.sqlite3
-    expose:
-      - 8000
+      - production_django_media:/app/media
+      - production_django_static:/app/staticfiles
     env_file:
-      - .env
-    environment:
-      - REDIS_HOST=redis
+      - ./.envs/.production/.django
+      - ./.envs/.production/.postgres
     depends_on:
       - redis
 
@@ -25,13 +25,14 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./static:/static
+      - production_django_media:/usr/src/app/media:ro
+      - production_django_static:/usr/src/app/staticfiles
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/fullchain.pem:/etc/nginx/fullchain.pem
       - ./nginx/privkey.pem:/etc/nginx/privkey.pem
     depends_on:
-      - web
+      - django
 
   redis:
     image: redis:latest
@@ -40,39 +41,14 @@ services:
     volumes:
       - redis_data:/data
 
-  celery:
-    build: .
-    command: >
-      sh -c "python manage.py migrate &&
-             celery -A pastebinir worker --loglevel=info"
-    volumes:
-      - .:/app
-      - ./static:/static
-      - ./db.sqlite3:/app/db.sqlite3
-    env_file:
-      - .env
-    environment:
-      - REDIS_HOST=redis
-    depends_on:
-      - redis
-      - web
 
-  celery-beat:
-    build: .
-    command: >
-      sh -c "python manage.py migrate &&
-             celery -A pastebinir beat --loglevel=info"
-    volumes:
-      - .:/app
-      - ./static:/static
-      - ./db.sqlite3:/app/db.sqlite3
-    env_file:
-      - .env
-    environment:
-      - REDIS_HOST=redis
-    depends_on:
-      - redis
-      - web
+  celeryworker:
+    <<: *django
+    image: printir_production_celeryworker
+    command: /start-celeryworker
 
-volumes:
-  redis_data: 
+  celerybeat:
+    <<: *django
+    image: printir_production_celerybeat
+    command: /start-celerybeat
+
