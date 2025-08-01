@@ -2,6 +2,7 @@
 *.py[c|o]
 .venv/
 .env
+*/__pycache__
 telegram bot/
 nginx/
 static/admin/
