@@ -1,4 +1,6 @@
 volumes:
+  production_postgres_data: {}
+  production_postgres_data_backups: {}
   production_django_media: {}
   production_django_static: {}
   production_redis_data: {}
@@ -14,10 +16,22 @@ services:
       - production_django_media:/app/media
       - production_django_static:/app/staticfiles
     env_file:
-      - ./.envs/.production/.django
-      - ./.envs/.production/.postgres
+      - ./.env
     depends_on:
       - redis
+      - postgres
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: printir_production_postgres
+    volumes:
+      - production_postgres_data:/var/lib/postgresql/data
+      - production_postgres_data_backups:/backups
+    env_file:
+      - ./.env
+
 
   nginx:
     image: nginx:alpine

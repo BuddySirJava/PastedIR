@@ -81,15 +81,18 @@ WSGI_APPLICATION = 'pastebinir.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        'OPTIONS': {
-            'timeout': 20,  # 20 seconds timeout
-            'check_same_thread': False,  # Allow multiple threads
-        }
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("POSTGRES_NAME", default="postgres"),
+        "USER": env("POSTGRES_USER", default="postgres"),
+        "PASSWORD": env("POSTGRES_PASSWORD", default="postgres"),
+        "HOST": env("POSTGRES_HOST", default="localhost"),
+        "PORT": 5432,
+        "ATOMIC_REQUESTS": True,
+        "OPTIONS": {
+            "pool": {"max_lifetime": 60},
+        },
     }
 }
 
@@ -231,10 +234,6 @@ CELERY_BEAT_SCHEDULE = {
     'cleanup-expired-pastes': {
         'task': 'website.tasks.cleanup_expired_pastes',
         'schedule': 600.0,  # 10 minutes
-    },
-    'optimize-sqlite-database': {
-        'task': 'website.tasks.optimize_sqlite_database',
-        'schedule': 86400.0,  # 24 hours
     },
 }
 
