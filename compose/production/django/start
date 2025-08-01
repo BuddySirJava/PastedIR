@@ -7,4 +7,4 @@ set -o nounset
 
 python /app/manage.py collectstatic --noinput
 
-exec /usr/local/bin/gunicorn django_project.wsgi --bind 0.0.0.0:8000 --chdir=/app
+exec /usr/local/bin/gunicorn pastebinir.wsgi --bind 0.0.0.0:8000 --chdir=/app
