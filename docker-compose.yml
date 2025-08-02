@@ -11,7 +11,7 @@ services:
     build: 
       context: .
       dockerfile: ./compose/production/django/Dockerfile
-
+    command: /start
     volumes:
       - production_django_media:/app/media
       - production_django_static:/app/staticfiles
