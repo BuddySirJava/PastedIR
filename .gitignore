@@ -2,7 +2,6 @@
 *.py[c|o]
 .venv/
 .env
-*/migrations/
 */__pycache__/
 telegram bot/
 nginx/
