@@ -36,6 +36,7 @@ PastedIR/
 ├── 📁 templates/           # HTML templates
 ├── 📁 static/              # CSS, JS, images
 ├── 📁 compose/             # Docker configurations
+├── 📁 nginx-configs/       # Nginx configuration templates
 ├── 🐳 docker-compose.yml   # Container orchestration
 └── 📄 pyproject.toml       # Python dependencies
 ```
@@ -95,6 +96,46 @@ python manage.py runserver
 # Start scheduler worker (in another terminal)
 python manage.py scheduler_worker default
 ```
+
+## 🌐 Nginx Configuration
+
+The project includes pre-configured Nginx templates for production deployment:
+
+### Configuration Files
+- `nginx-configs/example.nginx.conf` - Main Nginx configuration
+- `nginx-configs/example.default.conf` - Server block configuration with:
+  - Rate limiting zones
+  - SSL/TLS configuration
+  - Security headers (CSP, HSTS, etc.)
+  - Bot server IP whitelisting
+  - Static file serving optimization
+
+### Setup Instructions
+1. Copy the example configurations to your Nginx directory:
+```bash
+sudo cp nginx-configs/example.nginx.conf /etc/nginx/nginx.conf
+sudo cp nginx-configs/example.default.conf /etc/nginx/sites-available/pasted.ir
+```
+
+2. Update the configuration files:
+   - Replace `example.com` with your domain
+   - Update SSL certificate paths
+   - Configure your bot server IP in the whitelist
+   - Adjust rate limiting settings as needed
+
+3. Enable the site:
+```bash
+sudo ln -s /etc/nginx/sites-available/pasted.ir /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+### Features
+- **Rate Limiting**: Separate zones for API, create endpoints, and general traffic
+- **Bot Whitelisting**: IP-based and token-based bot authentication
+- **Security Headers**: Comprehensive CSP, HSTS, and other security headers
+- **Static File Optimization**: Efficient serving of CSS, JS, and media files
+- **SSL/TLS**: Production-ready HTTPS configuration
 
 ## ⚙️ Configuration
 
