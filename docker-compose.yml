@@ -56,13 +56,8 @@ services:
       - production_redis_data:/data
 
 
-  celeryworker:
+  scheduler:
     <<: *django
-    image: printir_production_celeryworker
-    command: /start-celeryworker
-
-  celerybeat:
-    <<: *django
-    image: printir_production_celerybeat
-    command: /start-celerybeat
+    image: printir_production_scheduler
+    command: python manage.py scheduler_worker default
 

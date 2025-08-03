@@ -52,8 +52,7 @@ INSTALLED_APPS = [
     'health_check.cache',
     'health_check.storage',
     'health_check.contrib.migrations',
-    'health_check.contrib.celery',              # requires celery
-    'health_check.contrib.celery_ping',         # requires celery
+
     'health_check.contrib.redis',               # requires Redis broker
     'scheduler',                                # django-tasks-scheduler
 ]
@@ -232,21 +231,8 @@ else:
 LANGUAGE_CACHE_KEY = 'all_languages'
 LANGUAGE_CACHE_TIMEOUT = 3600  # 1 hour
 
-# Celery Configuration
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
 
-# Celery Beat Schedule
-CELERY_BEAT_SCHEDULE = {
-    'cleanup-expired-pastes': {
-        'task': 'website.tasks.cleanup_expired_pastes',
-        'schedule': 600.0,  # 10 minutes
-    },
-}
+# Scheduled tasks are now defined in website/scheduler_tasks.py
 
 
 
@@ -261,8 +247,8 @@ HEALTH_CHECK = {
     'MEMORY_MIN': 100,    # in MB
     'SUBSETS': {
         'startup-probe': ['MigrationsHealthCheck', 'DatabaseBackend'],
-        'liveness-probe': ['DatabaseBackend', 'CacheBackend', 'CeleryHealthCheck'],
-        'readiness-probe': ['DatabaseBackend', 'CacheBackend', 'CeleryHealthCheck', 'RedisHealthCheck'],
+            'liveness-probe': ['DatabaseBackend', 'CacheBackend'],
+    'readiness-probe': ['DatabaseBackend', 'CacheBackend', 'RedisHealthCheck'],
     },
 }
 

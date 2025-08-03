@@ -1,4 +1,4 @@
-from celery import shared_task
+from scheduler import job
 from django.utils import timezone
 from django.core.cache import cache
 from .models import Paste
@@ -6,11 +6,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-@shared_task
+
+@job(schedule="*/10 * * * *")  # Every 10 minutes
 def cleanup_expired_pastes():
     """
     Clean up expired pastes and one-time pastes that have been viewed.
-    This task runs every 10 minutes via Celery Beat.
+    This task runs every 10 minutes via django-tasks-scheduler.
     """
     try:
         # Get current time
@@ -57,7 +58,8 @@ def cleanup_expired_pastes():
         logger.error(f"Error during automated paste cleanup: {e}")
         raise
 
-@shared_task
+
+@job
 def cleanup_single_paste(paste_id):
     """
     Clean up a specific paste by ID.
@@ -91,27 +93,28 @@ def cleanup_single_paste(paste_id):
         logger.error(f"Error cleaning up paste {paste_id}: {e}")
         raise
 
-@shared_task
-def optimize_sqlite_database():
+
+@job(schedule="0 2 * * *")  # Every day at 2 AM
+def optimize_database():
     """
-    Optimize SQLite database by running VACUUM and ANALYZE.
+    Optimize database by running maintenance tasks.
     This should be run periodically to maintain performance.
     """
     try:
         from django.db import connection
         
         with connection.cursor() as cursor:
-            # Run VACUUM to reclaim space and optimize
+            # Run VACUUM to reclaim space and optimize (for SQLite)
             cursor.execute("VACUUM")
-            logger.info("SQLite VACUUM completed")
+            logger.info("Database VACUUM completed")
             
-            # Run ANALYZE to update statistics
+            # Run ANALYZE to update statistics (for SQLite)
             cursor.execute("ANALYZE")
-            logger.info("SQLite ANALYZE completed")
+            logger.info("Database ANALYZE completed")
         
-        logger.info("SQLite database optimization completed")
+        logger.info("Database optimization completed")
         return "Database optimization completed"
         
     except Exception as e:
-        logger.error(f"Error optimizing SQLite database: {e}")
+        logger.error(f"Error optimizing database: {e}")
         raise 

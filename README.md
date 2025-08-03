@@ -35,8 +35,9 @@ PastedIR/
 ├── 📁 website/             # Web application views
 ├── 📁 templates/           # HTML templates
 ├── 📁 static/              # CSS, JS, images
+├── 📁 compose/             # Docker configurations
 ├── 🐳 docker-compose.yml   # Container orchestration
-└── 📄 requirements.txt     # Python dependencies
+└── 📄 pyproject.toml       # Python dependencies
 ```
 
 ## 🚀 Quick Start
@@ -45,7 +46,7 @@ PastedIR/
 - Python 3.11+
 - uv
 - Docker & Docker Compose
-- Redis (for Celery tasks)
+- Redis (for caching and task scheduling)
 
 ### 1. Clone the Repository
 ```bash
@@ -64,7 +65,7 @@ nano .env
 
 ### 3. Docker Deployment (Recommended)
 ```bash
-# Start all services
+# Start all services (includes PostgreSQL and Redis)
 docker-compose up -d
 
 # View logs
@@ -82,7 +83,6 @@ source .venv/bin/activate  # Linux/Mac
 # or
 .venv\Scripts\activate     # Windows
 
-
 # Run migrations
 python manage.py migrate
 
@@ -92,11 +92,8 @@ python manage.py createsuperuser
 # Start development server
 python manage.py runserver
 
-# Start Celery worker (in another terminal)
-celery -A pastebinir worker --loglevel=info
-
-# Start Celery beat (in another terminal)
-celery -A pastebinir beat --loglevel=info
+# Start scheduler worker (in another terminal)
+python manage.py scheduler_worker default
 ```
 
 ## ⚙️ Configuration
@@ -109,8 +106,11 @@ SECRET_KEY=your-secret-key-here
 DEBUG=False
 ALLOWED_HOSTS=your-domain.com,localhost
 
-# Database
-DATABASE_URL=sqlite:///db.sqlite3
+# Database (PostgreSQL)
+POSTGRES_NAME=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_HOST=localhost
 
 # Static Files
 STATIC_URL=/static/
@@ -120,7 +120,7 @@ STATIC_ROOT=/static
 CSRF_TRUSTED_ORIGINS=https://your-domain.com
 BOT_TOKEN=your-bot-token-for-api-calls
 
-# Redis (for Celery)
+# Redis (for caching and task scheduling)
 REDIS_HOST=localhost
 REDIS_PORT=6379
 ```
@@ -195,8 +195,8 @@ The application supports dark/light mode with automatic theme switching. Customi
 # View application logs
 docker-compose logs -f web
 
-# View Celery logs
-docker-compose logs -f celery
+# View scheduler logs
+docker-compose logs -f scheduler
 ```
 
 ### Health Checks

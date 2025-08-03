@@ -54,24 +54,12 @@ services:
       - production_redis_data:/data
 
 
-  celeryworker:
-    <<: *django
-    build: 
-      context: .
-      dockerfile: ./compose/development/django/Dockerfile
-    command: /start-celeryworker
-    volumes:
-      - .:/app:ro  # Mount entire project for live development
-    environment:
-      - DEBUG=True
-      - PYTHONPATH=/app
-
   scheduler:
     <<: *django
     build: 
       context: .
       dockerfile: ./compose/development/django/Dockerfile
-    command: python manage.py run_scheduler
+    command: python manage.py scheduler_worker default
     volumes:
       - .:/app:ro  # Mount entire project for live development
     environment:
