@@ -1,0 +1,83 @@
+volumes:
+  production_postgres_data: {}
+  production_postgres_data_backups: {}
+  production_django_media: {}
+  production_django_static: {}
+  production_redis_data: {}
+
+
+services:
+  django: &django
+    build: 
+      context: .
+      dockerfile: ./compose/development/django/Dockerfile
+    command: /start-dev
+    volumes:
+      - .:/app:ro  # Mount entire project for live development
+    user: "django"
+    env_file:
+      - ./.env
+    environment:
+      - DEBUG=True
+      - PYTHONPATH=/app
+      - DJANGO_SETTINGS_MODULE=pastebinir.settings_dev
+    depends_on:
+      - redis
+      - postgres
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: printir_production_postgres
+    volumes:
+      - production_postgres_data:/var/lib/postgresql/data
+      - production_postgres_data_backups:/backups
+    env_file:
+      - ./.env
+
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./compose/development/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - django
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - production_redis_data:/data
+
+
+  celeryworker:
+    <<: *django
+    build: 
+      context: .
+      dockerfile: ./compose/development/django/Dockerfile
+    command: /start-celeryworker
+    volumes:
+      - .:/app:ro  # Mount entire project for live development
+    environment:
+      - DEBUG=True
+      - PYTHONPATH=/app
+
+  scheduler:
+    <<: *django
+    build: 
+      context: .
+      dockerfile: ./compose/development/django/Dockerfile
+    command: python manage.py run_scheduler
+    volumes:
+      - .:/app:ro  # Mount entire project for live development
+    environment:
+      - DEBUG=True
+      - PYTHONPATH=/app
+    depends_on:
+      - redis
+      - postgres
+

@@ -3,7 +3,7 @@
 .venv/
 .env
 */migrations/
-*/__pycache__
+*/__pycache__/
 telegram bot/
 nginx/
 static/admin/
