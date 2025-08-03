@@ -1,0 +1,3 @@
+[submodule "telegram-bot"]
+	path = telegram-bot
+	url = https://github.com/BuddySirJava/pasted-ir-telegram-bot.git
