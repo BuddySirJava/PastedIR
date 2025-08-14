@@ -19,5 +19,5 @@ dependencies = [
     "psycopg[c,pool]>=3.2.9 ; sys_platform != 'win32'",
     "python-dotenv>=1.1.1",
     "redis>=6.2.0",
+    "g4f",
 ]
-

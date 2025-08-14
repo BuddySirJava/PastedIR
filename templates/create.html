@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Create New Paste - Pasted IR{% endblock %}
 
@@ -37,17 +38,19 @@
 
             <div>
                 <label for="language" class="block text-theme-primary font-semibold mb-2">Language:</label>
-                <select 
-                    name="language" 
-                    id="language" 
-                    class="w-full border border-theme rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                    required
-                >
-                    <option value="auto" selected>🤖 Auto Detect</option>
-                    {% for language in languages %}
-                        <option value="{{ language.id }}">{{ language.displayname }}</option>
-                    {% endfor %}
-                </select>
+                <div class="relative">
+                    <select 
+                        name="language" 
+                        id="language" 
+                        class="w-full border border-theme rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer" 
+                        required
+                    >
+                        <option value="auto" selected>🤖 Auto Detect</option>
+                        {% for language in languages %}
+                            <option value="{{ language.id }}">{{ language.displayname }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <div id="detectedLanguage" class="mt-2 text-sm text-theme-secondary hidden">
                     <span>Detected: </span><span id="detectedLanguageName" class="font-semibold"></span>
                 </div>
@@ -98,6 +101,9 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<!-- Language Search Component -->
+<script src="{% static 'js/language-search.js' %}"></script>
+
 <script>
     // Language detection functionality
     const textarea = document.getElementById('content');
@@ -144,7 +150,7 @@
             keywords: ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'FROM', 'WHERE']
         },
         'bash': {
-            patterns: [/#!/bin/, /echo/, /if\s+\[/, /for\s+/, /\.sh$/],
+            patterns: ['/#!/bin/', /echo/, /if\s+\[/, /for\s+/, /\.sh$/],
             keywords: ['#!/bin', 'echo', 'if [', 'for', 'while', 'do', 'done']
         },
         'json': {
@@ -224,7 +230,12 @@
     
     // Event listeners for language detection
     textarea.addEventListener('input', updateDetectedLanguage);
+    
+    // Listen for changes from the search component
     languageSelect.addEventListener('change', updateDetectedLanguage);
+    
+    // Also listen for custom events from the search component
+    document.addEventListener('languageSelected', updateDetectedLanguage);
     
     // Fullscreen functionality for textarea
     const fullscreenBtn = document.createElement('button');

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}View Paste - Pasted IR{% endblock %}
 
@@ -6,6 +7,7 @@
 
 {% block extra_head %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         hljs.highlightAll();
@@ -37,22 +39,45 @@
                 {% endif %}
             </h2>
             <div class="flex flex-wrap gap-2">
-                <button id="highlightToggle" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                {% if content %}
+                <button id="paste-ask-ai-btn" class="bg-purple-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                    🤖 Ask AI
+                </button>
+                {% endif %}
+                <button id="paste-highlight-toggle" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                     🎨 Toggle Highlight
                 </button>
                 <a href="{% url 'view_raw_paste' paste_id=request.resolver_match.kwargs.paste_id %}" 
                    class="bg-gray-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors copy-button">
                     👁️ View Raw
                 </a>
-                <button id="copyBtn" class="bg-green-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-700 transition-colors copy-button">
+                <button id="paste-copy-btn" class="bg-green-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-700 transition-colors copy-button">
                     📋 Copy
                 </button>
             </div>
         </div>
 
+        {{ content|json_script:"paste-content" }}
+
         <div id="highlightedContent" class="card rounded-lg overflow-hidden">
-            <pre class="p-6 m-0"><code class="language_{{ lang.alias }}">{{ content }}</code></pre>
+            <pre class="p-6 m-0"><code class="language-{{ lang.alias }}"></code></pre>
         </div>
+
+        <!-- Chat Modal -->
+        <div id="paste-chat-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+            <div class="card rounded-lg shadow-lg p-6 w-full max-w-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-theme-primary">Ask the AI</h2>
+                    <button id="paste-close-chat-btn" class="text-theme-secondary hover:text-theme-primary text-2xl font-bold">&times;</button>
+                </div>
+                <div id="paste-chat-history" class="h-64 overflow-y-auto mb-4 p-4 bg-theme-secondary rounded-lg"></div>
+                <div class="flex">
+                    <input type="text" id="paste-chat-input" class="flex-grow border border-theme rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ask a question...">
+                    <button id="paste-send-chat-btn" class="ml-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Send</button>
+                </div>
+            </div>
+        </div>
+
     {% elif error %}
         <div class="card rounded-lg p-6">
             <p class="text-red-500 text-lg">{{ error }}</p>
@@ -95,74 +120,14 @@
 
 {% block extra_scripts %}
 {% if content %}
+<script src="{% static 'js/view-paste.js' %}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const content = `{{ content|escapejs }}`;
-        const copyBtn = document.getElementById('copyBtn');
-        const highlightToggle = document.getElementById('highlightToggle');
-        const codeElement = document.querySelector('code');
-        
-        // Copy functionality
-        copyBtn.addEventListener('click', function() {
-            const originalText = copyBtn.innerHTML;
-            
-            navigator.clipboard.writeText(content).then(function() {
-                copyBtn.innerHTML = '✅ Copied!';
-                copyBtn.classList.add('copied');
-                
-                setTimeout(function() {
-                    copyBtn.innerHTML = originalText;
-                    copyBtn.classList.remove('copied');
-                }, 2000);
-            }).catch(function(err) {
-                console.error('Could not copy text: ', err);
-                copyBtn.innerHTML = '❌ Failed';
-                copyBtn.style.backgroundColor = '#dc2626';
-                
-                setTimeout(function() {
-                    copyBtn.innerHTML = originalText;
-                    copyBtn.style.backgroundColor = '';
-                }, 2000);
-            });
-        });
-        
-        // Highlight toggle functionality
-        let isHighlighted = true;
-        highlightToggle.addEventListener('click', function() {
-            if (isHighlighted) {
-                // Remove highlighting
-                codeElement.className = '';
-                highlightToggle.innerHTML = '🎨 Enable Highlight';
-                isHighlighted = false;
-            } else {
-                // Enable highlighting
-                codeElement.className = 'language_{{ lang.alias }}';
-                highlightToggle.innerHTML = '🎨 Disable Highlight';
-                isHighlighted = true;
-                
-                // Re-highlight if highlight.js is available
-                if (typeof hljs !== 'undefined') {
-                    setTimeout(() => {
-                        hljs.highlightAll();
-                        // Ensure proper text color after highlighting
-                        const isDark = document.documentElement.classList.contains('dark');
-                        if (isDark) {
-                            codeElement.style.color = '#ffffff';
-                        } else {
-                            codeElement.style.color = '#000000';
-                        }
-                    }, 100);
-                }
-            }
-        });
-        
-        // Keyboard shortcut for highlight toggle (Ctrl/Cmd + H)
-        document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
-                e.preventDefault();
-                highlightToggle.click();
-            }
-        });
+    // Initialize the paste viewer with configuration from Django
+    PasteViewer.init({
+        pasteId: '{{ request.resolver_match.kwargs.paste_id }}',
+        csrfToken: '{{ csrf_token }}',
+        chatbotUrl: "{% url 'chatbot' %}",
+        langAlias: '{{ lang.alias|default:"" }}'
     });
 </script>
 {% endif %}

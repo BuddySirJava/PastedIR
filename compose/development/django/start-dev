@@ -36,4 +36,9 @@ END
 >&2 echo 'PostgreSQL is available'
 
 # Run Django development server with auto-reload
-exec python /app/manage.py runserver 0.0.0.0:8000 
+exec gunicorn pastebinir.wsgi:application \
+    --bind 0.0.0.0:8000 \
+    --workers 1 \
+    --worker-class gevent \
+    --log-level info \
+    --log-file=- 

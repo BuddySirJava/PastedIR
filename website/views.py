@@ -301,21 +301,21 @@ def view_encrypted_paste(request, paste_id):
                     decrypted_content = decrypt(paste.salt, paste.iv, paste.ciphertext, password)
                     paste.view_count += 1
                     paste.save()
-                    return render(request, 'view.html', {'content': decrypted_content, 'lang': paste.lang})
+                    return render(request, 'view.html', {'content': decrypted_content, 'lang': paste.lang, 'paste': paste})
                 except Exception as e:
                     print(f"Decryption error: {e}")
-                    return render(request, 'view.html', {'error': 'Incorrect password. Please try again.', 'lang': paste.lang})
+                    return render(request, 'view.html', {'error': 'Incorrect password. Please try again.', 'lang': paste.lang, 'paste': paste})
         paste.view_count += 1
         paste.save()
 
-        return render(request, 'view.html', {'lang': paste.lang, 'has_password': True})
+        return render(request, 'view.html', {'lang': paste.lang, 'has_password': True, 'paste': paste})
 
     else:
         decrypted_content = paste.ciphertext
         paste.view_count += 1
         paste.save()
 
-        return render(request, 'view.html', {'content': decrypted_content, 'lang': paste.lang})
+        return render(request, 'view.html', {'content': decrypted_content, 'lang': paste.lang, 'paste': paste})
 
 def history(request):
     pastes = []

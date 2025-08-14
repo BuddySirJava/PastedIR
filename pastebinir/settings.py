@@ -99,6 +99,10 @@ DATABASES = {
         "PASSWORD": env("POSTGRES_PASSWORD", default="postgres"),
         "HOST": env("POSTGRES_HOST", default="localhost"),
         "PORT": 5432,
+        # Keep DB connections alive for a short time and health-check before use
+        # Helps auto-recover from "[BAD]" connections after PostgreSQL restarts or network hiccups
+        "CONN_MAX_AGE": int(os.getenv("DB_CONN_MAX_AGE", 60)),
+        "CONN_HEALTH_CHECKS": True,
         "ATOMIC_REQUESTS": True,
         "OPTIONS": {
             "pool": {"max_lifetime": 60},

@@ -2,15 +2,38 @@
 
 set -o errexit
 set -o pipefail
-set -o nounset
+# Remove nounset to allow undefined variables
+# set -o nounset
 
 
 
 
-if [ -z "${POSTGRES_USER}" ]; then
-    base_postgres_image_default_user='postgres'
-    export POSTGRES_USER="${base_postgres_image_default_user}"
+# Set default values for database connection
+if [ -z "${POSTGRES_USER:-}" ]; then
+    export POSTGRES_USER="postgres"
 fi
+
+if [ -z "${POSTGRES_PASSWORD:-}" ]; then
+    export POSTGRES_PASSWORD="postgres"
+fi
+
+# Handle both POSTGRES_DB and POSTGRES_NAME (for compatibility)
+if [ -z "${POSTGRES_DB:-}" ]; then
+    if [ -n "${POSTGRES_NAME:-}" ]; then
+        export POSTGRES_DB="${POSTGRES_NAME}"
+    else
+        export POSTGRES_DB="postgres"
+    fi
+fi
+
+if [ -z "${POSTGRES_HOST:-}" ]; then
+    export POSTGRES_HOST="postgres"
+fi
+
+if [ -z "${POSTGRES_PORT:-}" ]; then
+    export POSTGRES_PORT="5432"
+fi
+
 export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
 
 python << END

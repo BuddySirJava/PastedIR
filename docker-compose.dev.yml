@@ -2,7 +2,7 @@ volumes:
   production_postgres_data: {}
   production_postgres_data_backups: {}
   production_django_media: {}
-  production_django_static: {}
+  static_volume: {}
   production_redis_data: {}
 
 
@@ -14,6 +14,7 @@ services:
     command: /start-dev
     volumes:
       - .:/app:ro  # Mount entire project for live development
+      - static_volume:/app/static
     user: "django"
     env_file:
       - ./.env
@@ -43,6 +44,7 @@ services:
       - "80:80"
     volumes:
       - ./compose/development/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - static_volume:/app/static
     depends_on:
       - django
 

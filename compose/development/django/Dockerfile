@@ -16,11 +16,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV BUILD_ENV=${BUILD_ENVIRONMENT}
 
-ADD . /app
 WORKDIR ${APP_HOME}
-
-RUN addgroup --system django \
-  && adduser --system --ingroup django django
 
 # Install apt packages
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -32,37 +28,48 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   curl \
   ca-certificates \
   gettext \
-  locales
+  locales \
+  # Headless browser dependencies
+    libglib2.0-0 \
+    libnss3 \
+    libgconf-2-4 \
+    libfontconfig1 \
+    libdbus-glib-1-2
 
-# install dep
-ENV UV_INSTALL_DIR="/root/.local/bin/"
+# install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
 ENV PATH="/root/.local/bin/:$PATH"
 ENV UV_PROJECT_ENVIRONMENT="/usr/local/"
-RUN uv sync -U --compile-bytecode --no-cache --no-editable
 
+# Copy dependency files and install dependencies
+# This layer is cached and only re-run when dependency files change
+COPY pyproject.toml uv.lock ./
+RUN uv sync -U --compile-bytecode --no-cache --no-editable && \
+    uv pip install --system gunicorn gevent
+
+# Create non-root user
+RUN addgroup --system django \
+  && adduser --system --ingroup django django
+
+# Copy entrypoint and startup scripts
 COPY --chown=django:django ./compose/production/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
 RUN chmod +x /entrypoint
 
-# Don't create media and staticfiles directories - they'll be mounted as volumes
-
-# Copy production startup scripts
 COPY --chown=django:django ./compose/production/django/start /start
 RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 
-# copy application code to WORKDIR
-COPY --chown=django:django . ${APP_HOME}
-
-# Copy development startup script (after app code is copied)
 COPY --chown=django:django ./compose/development/django/start-dev /start-dev
 RUN sed -i 's/\r$//g' /start-dev
 RUN chmod +x /start-dev
+
+# Copy the rest of the application code
+COPY --chown=django:django . ${APP_HOME}
 
 # make django owner of the WORKDIR directory as well.
 RUN chown -R django:django ${APP_HOME}
 
 USER django
 
-ENTRYPOINT ["/entrypoint"] 
+ENTRYPOINT ["/entrypoint"]

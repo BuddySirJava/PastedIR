@@ -276,4 +276,27 @@
 
 .dark p {
     color: #cbd5e1 !important;
-} 
+}
+
+/* Chatbox message styling */
+.dark .chat-message-user span {
+    color: var(--text-secondary);
+}
+
+.dark .chat-message-ai span {
+    color: #81a1c1; /* A calm blue for AI responses */
+}
+
+/* Force dark theme for Markdown code blocks in chat */
+#paste-chat-history .chat-message-ai .prose pre {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+#paste-chat-history .chat-message-ai .prose code {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    font-family: 'Courier New', Courier, monospace;
+}
