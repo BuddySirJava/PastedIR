@@ -9,102 +9,28 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-import os
+
 from pathlib import Path
+
+import environ
+
+from cbs import BaseSettings
+
 from dotenv import load_dotenv
-from typing import Dict
+
 from scheduler.types import SchedulerConfiguration, Broker, QueueConfiguration
+
+env = environ.Env()
 
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = os.environ.get
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+ROOT_URLCONF = "pastebinir.urls"
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-ALLOWED_HOSTS = env("ALLOWED_HOSTS", "*").split(",")
-
-# Application definition
-
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'website',
-    'api',
-    'drf_spectacular',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'dj_rest_auth',
-    'health_check',                             # required
-    'health_check.db',                          # stock Django health checkers
-    'health_check.cache',
-    'health_check.storage',
-    'health_check.contrib.migrations',
-
-    'health_check.contrib.redis',               # requires Redis broker
-    'scheduler',                                # django-tasks-scheduler
-]
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-
-ROOT_URLCONF = 'pastebinir.urls'
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
-
-WSGI_APPLICATION = 'pastebinir.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("POSTGRES_NAME", default="postgres"),
-        "USER": env("POSTGRES_USER", default="postgres"),
-        "PASSWORD": env("POSTGRES_PASSWORD", default="postgres"),
-        "HOST": env("POSTGRES_HOST", default="localhost"),
-        "PORT": 5432,
-        "ATOMIC_REQUESTS": True,
-        "OPTIONS": {
-            "pool": {"max_lifetime": 60},
-        },
-    }
-}
+WSGI_APPLICATION = "pastebinir.wsgi.application"
 
 
 # Password validation
@@ -112,16 +38,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -129,150 +55,328 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
 USE_TZ = True
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES" : [
+    "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
-    "DEFAULT_AUTHENTICATION_CLASSES" : [
-      "rest_framework.authentication.SessionAuthentication",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
-    "DEFAULT_SCHEMA_CLASS" : "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE" : "Pasted IR Documentation",
+    "TITLE": "Pasted IR Documentation",
     "DESCRIPTION": "A simple django based pastebin",
-    "VERSION": "0.1 Snapshot"
+    "VERSION": "0.1 Snapshot",
 }
 
-# Session Security Settings
-SESSION_COOKIE_SECURE = True  # Only send cookies over HTTPS
-SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookies
-SESSION_COOKIE_SAMESITE = 'Strict'  # Prevent CSRF attacks
-SESSION_COOKIE_AGE = 3600  # Session expires in 1 hour (3600 seconds)
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Session expires when browser closes
-SESSION_SAVE_EVERY_REQUEST = True  # Update session on every request
-
-# CSRF Security
-CSRF_COOKIE_SECURE = True  # Only send CSRF cookies over HTTPS
-CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access to CSRF token (needed for forms)
-CSRF_COOKIE_SAMESITE = 'Lax'  # Allow CSRF tokens for same-site requests
-CSRF_TRUSTED_ORIGINS = ['https://pasted.ir', 'https://www.pasted.ir']
-
-# Security settings for static files
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
-
-# Additional security headers
-SECURE_HSTS_SECONDS = 31536000  # 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
-
-# Rate limiting
-RATE_LIMIT_ENABLED = True
-RATE_LIMIT_REQUESTS = 100  # requests per hour
-RATE_LIMIT_WINDOW = 3600  # 1 hour
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / "static",
 ]
 
 # Static files finders
 STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
 
 # Cache configuration
-import os
 
 # Use Redis if available, otherwise fall back to local memory
-if os.environ.get('REDIS_HOST', 'redis') == 'redis':
-    CACHES = {
-        'default': {
-            'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': 'redis://redis:6379/1',
-            'OPTIONS': {
-                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            },
-            'TIMEOUT': 300,  # 5 minutes default
-        }
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "TIMEOUT": 300,  # 5 minutes default
     }
-else:
-    # Fallback to local memory cache for development
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'unique-snowflake',
-            'TIMEOUT': 300,  # 5 minutes default
-            'OPTIONS': {
-                'MAX_ENTRIES': 1000,
-            }
-        }
-    }
+}
 
 # Cache languages for better performance
-LANGUAGE_CACHE_KEY = 'all_languages'
+LANGUAGE_CACHE_KEY = "all_languages"
 LANGUAGE_CACHE_TIMEOUT = 3600  # 1 hour
 
 
 # Scheduled tasks are now defined in website/scheduler_tasks.py
 
 
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Health Check Configuration
 HEALTH_CHECK = {
-    'DISK_USAGE_MAX': 90,  # percent
-    'MEMORY_MIN': 100,    # in MB
-    'SUBSETS': {
-        'startup-probe': ['MigrationsHealthCheck', 'DatabaseBackend'],
-            'liveness-probe': ['DatabaseBackend', 'CacheBackend'],
-    'readiness-probe': ['DatabaseBackend', 'CacheBackend', 'RedisHealthCheck'],
+    "DISK_USAGE_MAX": 90,  # percent
+    "MEMORY_MIN": 100,  # in MB
+    "SUBSETS": {
+        "startup-probe": ["MigrationsHealthCheck", "DatabaseBackend"],
+        "liveness-probe": ["DatabaseBackend", "CacheBackend"],
+        "readiness-probe": ["DatabaseBackend", "CacheBackend", "RedisHealthCheck"],
     },
 }
 
 # Health Check Cache Key
-HEALTHCHECK_CACHE_KEY = 'pastedir_healthcheck'
+HEALTHCHECK_CACHE_KEY = "pastedir_healthcheck"
 
 # Scheduler Configuration
 SCHEDULER_CONFIG = SchedulerConfiguration(
     EXECUTIONS_IN_PAGE=20,
     SCHEDULER_INTERVAL=10,
     BROKER=Broker.REDIS,
-    CALLBACK_TIMEOUT=60,  # Callback timeout in seconds (success/failure/stopped)
+    # Callback timeout in seconds (success/failure/stopped)
+    CALLBACK_TIMEOUT=60,
     # Default values, can be overriden per task/job
-    DEFAULT_SUCCESS_TTL=10 * 60,  # Time To Live (TTL) in seconds to keep successful job results
-    DEFAULT_FAILURE_TTL=365 * 24 * 60 * 60,  # Time To Live (TTL) in seconds to keep job failure information
-    DEFAULT_JOB_TTL=10 * 60,  # Time To Live (TTL) in seconds to keep job information
+    # Time To Live (TTL) in seconds to keep successful job results
+    DEFAULT_SUCCESS_TTL=10 * 60,
+    # Time To Live (TTL) in seconds to keep job failure information
+    DEFAULT_FAILURE_TTL=365 * 24 * 60 * 60,
+    # Time To Live (TTL) in seconds to keep job information
+    DEFAULT_JOB_TTL=10 * 60,
     DEFAULT_JOB_TIMEOUT=5 * 60,  # timeout (seconds) for a job
     # General configuration values
-    DEFAULT_WORKER_TTL=10 * 60,  # Time To Live (TTL) in seconds to keep worker information after last heartbeat
-    DEFAULT_MAINTENANCE_TASK_INTERVAL=10 * 60,  # The interval to run maintenance tasks in seconds. 10 minutes.
-    DEFAULT_JOB_MONITORING_INTERVAL=30,  # The interval to monitor jobs in seconds.
-    SCHEDULER_FALLBACK_PERIOD_SECS=120,  # Period (secs) to wait before requiring to reacquire locks
+    # Time To Live (TTL) in seconds to keep worker information after last heartbeat
+    DEFAULT_WORKER_TTL=10 * 60,
+    # The interval to run maintenance tasks in seconds. 10 minutes.
+    DEFAULT_MAINTENANCE_TASK_INTERVAL=10 * 60,
+    # The interval to monitor jobs in seconds.
+    DEFAULT_JOB_MONITORING_INTERVAL=30,
+    # Period (secs) to wait before requiring to reacquire locks
+    SCHEDULER_FALLBACK_PERIOD_SECS=120,
 )
 
-SCHEDULER_QUEUES: Dict[str, QueueConfiguration] = {
-    'default': QueueConfiguration(URL='redis://redis:6379/0'),
+SCHEDULER_QUEUES: dict[str, QueueConfiguration] = {
+    "default": QueueConfiguration(URL="redis://redis:6379/0"),
 }
+
+
+class Settings(BaseSettings):
+    SECRET_KEY = env.str("SECRET_KEY")
+    ALLOWED_HOSTS = ("localhost", "127.0.0.1")
+    INTERNAL_IPS = ("127.0.0.1",)
+    SITE_ID = 1
+    DEBUG = env.bool("DEBUG", True)
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+
+    TEMPLATES = [
+        {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [BASE_DIR / "templates"],
+            "APP_DIRS": True,
+            "OPTIONS": {
+                "context_processors": [
+                    "django.template.context_processors.debug",
+                    "django.template.context_processors.request",
+                    "django.contrib.auth.context_processors.auth",
+                    "django.contrib.messages.context_processors.messages",
+                ],
+            },
+        },
+    ]
+
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "verbose": {
+                "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
+            },
+        },
+        "handlers": {
+            "console": {
+                "level": "DEBUG",
+                "class": "logging.StreamHandler",
+                "formatter": "verbose",
+            }
+        },
+        "root": {"level": "INFO", "handlers": ["console"]},
+    }
+
+    def MIDDLEWARE(self):
+        return list(
+            filter(
+                None,
+                [
+                    "django.middleware.security.SecurityMiddleware",
+                    (
+                        "whitenoise.middleware.WhiteNoiseMiddleware"
+                        if self.DEBUG
+                        else None
+                    ),
+                    "django.contrib.sessions.middleware.SessionMiddleware",
+                    "django.middleware.common.CommonMiddleware",
+                    "django.middleware.csrf.CsrfViewMiddleware",
+                    "django.contrib.auth.middleware.AuthenticationMiddleware",
+                    "django.contrib.messages.middleware.MessageMiddleware",
+                    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+                    (
+                        "debug_toolbar.middleware.DebugToolbarMiddleware"
+                        if self.DEBUG
+                        else None
+                    ),
+                    (
+                        "django_browser_reload.middleware.BrowserReloadMiddleware"
+                        if self.DEBUG
+                        else None
+                    ),
+                ],
+            )
+        )
+
+    def DATABASES(self):
+        return {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": env("POSTGRES_NAME", default="postgres"),
+                "USER": env("POSTGRES_USER", default="postgres"),
+                "PASSWORD": env("POSTGRES_PASSWORD", default="postgres"),
+                "HOST": env("POSTGRES_HOST", default="localhost"),
+                "PORT": 5432,
+                "ATOMIC_REQUESTS": True,
+                "OPTIONS": {
+                    "pool": {"max_lifetime": 60},
+                },
+            }
+        }
+
+    def INSTALLED_APPS(self):
+        return list(
+            filter(
+                None,
+                [
+                    "django.contrib.admin",
+                    "django.contrib.auth",
+                    "django.contrib.contenttypes",
+                    "django.contrib.sessions",
+                    "django.contrib.messages",
+                    "whitenoise.runserver_nostatic" if self.DEBUG else None,
+                    "django.contrib.staticfiles",
+                    "django.contrib.sites",
+                    "django.contrib.sitemaps",
+                    # debug toolbar
+                    "debug_toolbar" if self.DEBUG else None,
+                    # browser reload
+                    "django_browser_reload" if self.DEBUG else None,
+                    # rest
+                    "drf_spectacular",
+                    "rest_framework",
+                    "rest_framework.authtoken",
+                    "dj_rest_auth",
+                    # health check
+                    "health_check",
+                    "health_check.db",
+                    "health_check.cache",
+                    "health_check.storage",
+                    "health_check.contrib.migrations",
+                    "health_check.contrib.redis",
+                    # django-tasks-scheduler
+                    "scheduler",
+                    # local
+                    "website",
+                    "api",
+                ],
+            )
+        )
+
+
+class ProdSettings(Settings):
+    DEBUG = env.bool("DEBUG", False)
+    ALLOWED_HOSTS = env.list(
+        "ALLOWED_HOSTS",
+    )
+    SESSION_COOKIE_SECURE = env.bool("DJANGO_SESSION_COOKIE_SECURE", default=True)
+    SESSION_COOKIE_HTTPONLY = env.bool("DJANGO_SESSION_COOKIE_HTTPONLY", default=True)
+
+    CSRF_TRUSTED_ORIGINS = env.list("DJANGO_TRUSTED_ORIGINS", default=["localhost"])
+    CSRF_COOKIE_SECURE = env.bool("DJANGO_CSRF_COOKIE_SECURE", default=True)
+    CSRF_COOKIE_HTTPONLY = env.bool("DJANGO_CSRF_COOKIE_HTTPONLY", default=True)
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "filters": {
+            "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"}
+        },
+        "formatters": {
+            "verbose": {
+                "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
+            },
+        },
+        "handlers": {
+            "mail_admins": {
+                "level": "ERROR",
+                "filters": ["require_debug_false"],
+                "class": "django.utils.log.AdminEmailHandler",
+            },
+            "console": {
+                "level": "DEBUG",
+                "class": "logging.StreamHandler",
+                "formatter": "verbose",
+            },
+        },
+        "root": {"level": "INFO", "handlers": ["console"]},
+        "loggers": {
+            "django.request": {
+                "handlers": ["mail_admins"],
+                "level": "ERROR",
+                "propagate": True,
+            },
+            "django.security.DisallowedHost": {
+                "level": "ERROR",
+                "handlers": ["console", "mail_admins"],
+                "propagate": True,
+            },
+        },
+    }
+
+
+class TestSettings(Settings):
+    SECRET_KEY = "testsecret"
+    PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
+    CART_SESSION_KEY = "cart"
+
+    def MIDDLEWARE(self):
+        return [
+            m
+            for m in super().MIDDLEWARE()
+            if m != "debug_toolbar.middleware.DebugToolbarMiddleware"
+            and m != "django_browser_reload.middleware.BrowserReloadMiddleware"
+        ]
+
+
+__getattr__, __dir__ = Settings.use()
