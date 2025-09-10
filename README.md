@@ -254,7 +254,7 @@ docker-compose logs -f scheduler
 
 ## 📝 License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](gnu-gpl-v3.0.md) file for details.
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -266,7 +266,7 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 ## 📞 Support
 
 - **Website**: [pasted.ir](https://pasted.ir)
-- **Issues**: [GitHub Issues](https://github.com/BuddySirJava/PastedIR/issues)
+- **Issues**: [GitCODE_OF_CONDUCTHub Issues](https://github.com/BuddySirJava/PastedIR/issues)
 - **Telegram**: [Send Private Message](https://telegram.me/Buddy_R)
 ---
 
